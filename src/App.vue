@@ -1,51 +1,38 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-
-console.log("[App.vue]", `Hello world from Electron ${process.versions.electron}!`)
-</script>
-
 <template>
   <div>
-    <a href="https://www.electronjs.org/" target="_blank">
-      <img src="./assets/electron.svg" class="logo electron" alt="Electron logo" />
-    </a>
-    <a href="https://vitejs.dev/" target="_blank">
-      <img src="./assets/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Electron + Vite + Vue" />
-  <div class="flex-center">
-    Place static files into the <code>/public</code> folder
-    <img style="width: 2.4em; margin-left: .4em;" src="/logo.svg" alt="Logo">
+    <p>Last Barcode: {{ lastBarcode }}</p>
+    <button @click="evento">CLick event</button>
+    <input style="border: 1px solid #000;">
   </div>
 </template>
 
-<style>
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+<script lang="ts" setup>
+import { ref, onMounted } from 'vue';
+let barcode = ref("");
+let interval: ReturnType<typeof setTimeout>;
+let lastBarcode = ref('')
+
+const handler = (evt: KeyboardEvent) => {
+  lastBarcode.value = ""
+  window.focus()
+  if (interval) clearInterval(interval);
+  if (evt.code === "Enter") {
+    if (barcode.value) {
+
+        lastBarcode.value = barcode.value
+
+      return;
+    }
+  }
+  if (evt.key !== "Shift") barcode.value += evt.key;
+  interval = setInterval(() => (barcode.value = ""), 200000);
+};
+
+const evento = ()=>{
+  console.log("Hola Mundo")
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-
-.logo.electron:hover {
-  filter: drop-shadow(0 0 2em #9FEAF9);
-}
-
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+onMounted(() => {
+  window.addEventListener("keydown", handler);
+})
+</script>
